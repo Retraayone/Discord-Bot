@@ -30,6 +30,11 @@ def get_quote():
 @bot.event
 async def on_ready():
     print("We have logged in as {0.user}".format(bot))
+    try:
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} command(s)")
+    except Exception as e:
+        print(f"Failed to sync commands: {e}")
 
 @bot.event
 async def on_message(message):
@@ -46,10 +51,10 @@ async def on_message(message):
     if any(word in msg for word in sad_words):
         await message.channel.send(random.choice(starter_encouragements))
 
-@bot.slash_command(name="inspire", description="Get an inspirational quote")
-async def inspire(ctx):
+@bot.tree.command(name="inspire", description="Get an inspirational quote")
+async def inspire(interaction: discord.Interaction):
     quote = get_quote()
-    await ctx.respond(quote)
+    await interaction.response.send_message(quote)
 
 # Get the token from the environment variable
 token = os.getenv('TOKEN')
